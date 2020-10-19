@@ -20,7 +20,7 @@ import java.math.*;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
 @TeleOp(name="holonomicmk1", group="teliop")
-@Disabled
+//@Disabled
 
 public class Holonomic5115Romero extends OpMode
 {
