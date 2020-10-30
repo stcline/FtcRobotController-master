@@ -1,28 +1,30 @@
 /* Created by Team 5115 at Windsor High School for the 2017-18 Season
-Includes a claw system and holonomic omni wheel drive system.
+This OpMode runs motors in the following configuration:
+
+       ////            \\\\
+      /F1/ ------------ \F2\
+     //// |            | \\\\
+          |            |
+          |            |
+     \\\\ |            | ////
+      \R1\ ------------ /R2/
+       \\\\            ////
+
  */
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.ftccommon.ClassManagerFactory;
-import com.qualcomm.robotcore.hardware.CRServo;
-import java.math.*;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 
-@TeleOp(name="holonomicmk1", group="teliop")
+@TeleOp(name="holonomic motors", group="teleop")
 //@Disabled
 
-public class Holonomic5115Romero extends OpMode
+public class RomeroHolonomicMotorsOnly extends OpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -30,21 +32,8 @@ public class Holonomic5115Romero extends OpMode
     private DcMotor F2 = null;
     private DcMotor R1 = null;
     private DcMotor R2 = null;
-    //private DcMotor Winch = null;
-    private CRServo claw_rotate = null;
-    private DcMotor arm_rotate = null;
-    private DcMotor arm_rotate2 = null;
-    private DcMotor extend = null;
 
-    public Servo claw_front_left = null;
-    public Servo claw_front_right = null;
-    private Servo Color_Arm = null;
-    private Servo claw_rear_left = null;
-    private Servo claw_rear_right = null;
-
-    /*
-     * Code to run ONCE when the driver hits INIT
-     */
+    //Code to run ONCE when the driver hits INIT
     @Override
     public void init() {
         // Set up the hardware
@@ -54,16 +43,6 @@ public class Holonomic5115Romero extends OpMode
         F2 = hardwareMap.get(DcMotor.class, "F2");
         R1 = hardwareMap.get(DcMotor.class, "R1");
         R2 = hardwareMap.get(DcMotor.class, "R2");
-        arm_rotate2 = hardwareMap.get(DcMotor.class, "arm_rotate2");
-        arm_rotate = hardwareMap.get(DcMotor.class,"arm_rotate");
-        claw_rotate = hardwareMap.get(CRServo.class,"claw_rotate");
-        extend = hardwareMap.get(DcMotor.class,"extend");
-
-        claw_front_left = hardwareMap.get(Servo.class, "claw_front_left");
-        claw_front_right = hardwareMap.get(Servo.class,"claw_front_right");
-        Color_Arm = hardwareMap.get(Servo.class,"color_arm");
-        claw_rear_left = hardwareMap.get(Servo.class,"claw_rear_left");
-        claw_rear_right = hardwareMap.get(Servo.class,"claw_rear_right");
 
         F1.setDirection(DcMotorSimple.Direction.FORWARD);
         F2.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -75,7 +54,6 @@ public class Holonomic5115Romero extends OpMode
         F2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         R1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         R2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        arm_rotate.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
@@ -83,23 +61,7 @@ public class Holonomic5115Romero extends OpMode
 
         telemetry.addData("Status", "Initialized v1");
     }
-
-    /*
-     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-     */
-    @Override
-    public void init_loop() {
-
-        claw_front_right.setPosition(0);
-        claw_front_left.setPosition(35);
-        claw_rear_right.setPosition(0);
-        claw_rear_left.setPosition(35);
-        Color_Arm.setPosition(90);
-    }
-
-    /*
-     * Code to run ONCE when the driver hits PLAY
-     */
+    //Code to run ONCE when the driver hits PLAY
     @Override
     public void start() {
         runtime.reset();
@@ -119,10 +81,6 @@ public class Holonomic5115Romero extends OpMode
         double powerF2;
         double powerR1;
         double powerR2;
-        double claw_open = 180;
-        double claw_close = 80;
-        Color_Arm.setPosition(.5);
-
 
         angle = Math.atan2(gamepad1.left_stick_x, gamepad1.left_stick_y);//finds angle of joystick
         telemetry.addData("angle: ", angle);//adds telemetry for troubleshooting code
@@ -157,57 +115,6 @@ public class Holonomic5115Romero extends OpMode
             F2.setPower(0);
             R1.setPower(0);//stops robot when no joystick is pressed 
             R2.setPower(0);
-        }
-
-        double arm_rotate_speed = .5;
-        if(gamepad2.a){
-            arm_rotate_speed = .8;
-        }
-        else{
-            arm_rotate_speed = .25;
-        }
-
-        if(Math.abs(gamepad2.left_stick_y)>.1){
-            arm_rotate.setPower(-gamepad2.left_stick_y * arm_rotate_speed);
-            arm_rotate2.setPower(-gamepad2.left_stick_y * arm_rotate_speed);
-        }
-        else{
-            arm_rotate.setPower(0);
-            arm_rotate2.setPower(0);
-        }
-
-        if(gamepad2.left_trigger > .1){
-            extend.setPower(gamepad2.left_trigger * .5);
-        }
-        else if(gamepad2.right_trigger > .1) {
-            extend.setPower(-gamepad2.right_trigger * .5);
-        }
-        else{
-            extend.setPower(0);
-        }
-
-
-        if(Math.abs(gamepad2.right_stick_y)>.1){
-            claw_rotate.setPower(gamepad2.right_stick_y);
-        }
-        else{
-            claw_rotate.setPower(0);
-        }
-        if(gamepad2.left_bumper){
-            claw_front_left.setPosition(0);
-            claw_front_right.setPosition(.3);
-        }
-        else{
-            claw_front_right.setPosition(0);
-            claw_front_left.setPosition(.3);
-        }
-        if(gamepad2.right_bumper){
-            claw_rear_left.setPosition(0);
-            claw_rear_right.setPosition(.3);
-        }
-        else{
-            claw_rear_left.setPosition(1);
-            claw_rear_right.setPosition(0);
         }
     }
 
